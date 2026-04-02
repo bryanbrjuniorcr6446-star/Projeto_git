@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="pt-BR" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cartão Dia das Mulheres</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&amp;family=Quicksand:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    .font-elegant { font-family: 'Cormorant Garamond', Georgia, serif; }
+    .font-soft { font-family: 'Quicksand', sans-serif; }
+    
+    .flower {
+      position: fixed;
+      top: -60px;
+      font-size: 24px;
+      pointer-events: none;
+      z-index: 100;
+      animation: fall linear forwards;
+      opacity: 0.9;
+    }
+    
+    @keyframes fall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+      5% { opacity: 0.9; }
+      95% { opacity: 0.9; }
+      100% { transform: translateY(110%) rotate(720deg); opacity: 0; }
+    }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes pulse-soft {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+    
+    @keyframes shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    
+    .card-appear { animation: fadeInUp 1.2s ease-out forwards; }
+    .card-hover:hover { animation: pulse-soft 2s ease-in-out infinite; }
+    
+    .quote-transition {
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    
+    .btn-shimmer {
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      background-size: 200% 100%;
+      animation: shimmer 2s infinite;
+    }
+    
+    @keyframes bounce-rotate {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.2) rotate(10deg); }
+    }
+    
+    @keyframes heart-float {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+    }
+    
+    .floating-heart {
+      position: fixed;
+      font-size: 20px;
+      pointer-events: none;
+      z-index: 50;
+      animation: heart-float 2s ease-out forwards;
+    }
+    
+    .interactive-btn {
+      cursor: pointer;
+      user-select: none;
+    }
+    
+    .gradient-border {
+      background: linear-gradient(135deg, #fce4ec, #f8bbd9, #f48fb1, #fce4ec);
+      background-size: 300% 300%;
+      animation: gradient-move 8s ease infinite;
+    }
+    
+    @keyframes gradient-move {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Envelope Styles */
+    .envelope-closed {
+      perspective: 1200px;
+      cursor: pointer;
+    }
+    
+    .envelope-container {
+      position: relative;
+      width: 300px;
+      height: 200px;
+      margin: 0 auto;
+    }
+    
+    .envelope-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #f8bbd9 0%, #f48fb1 100%);
+      border-radius: 8px;
+      box-shadow: 0 20px 60px rgba(244, 143, 177, 0.4);
+    }
+    
+    .envelope-front {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 100%);
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(244, 143, 177, 0.3);
+      overflow: hidden;
+    }
+    
+    .envelope-flap {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-left: 150px solid transparent;
+      border-right: 150px solid transparent;
+      border-top: 100px solid #f48fb1;
+      top: 0;
+      left: 0;
+      transform-origin: top center;
+      transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      z-index: 10;
+    }
+    
+    .envelope-open .envelope-flap {
+      transform: rotateX(-180deg);
+    }
+    
+    .envelope-content {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 50%;
+      opacity: 0;
+      transition: opacity 0.8s ease 0.4s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .envelope-open .envelope-content {
+      opacity: 1;
+    }
+    
+    .envelope-text {
+      font-size: 18px;
+      color: #ad1457;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      text-align: center;
+      font-style: italic;
+      padding: 20px;
+    }
+    
+    .open-envelope-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 12px 30px;
+      background: linear-gradient(135deg, #f8bbd9 0%, #f48fb1 100%);
+      color: #880e4f;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(244, 143, 177, 0.3);
+    }
+    
+    .open-envelope-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(244, 143, 177, 0.5);
+    }
+    
+    .open-envelope-btn:active {
+      transform: scale(0.95);
+    }
+
+    .hidden { display: none !important; }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full font-soft">
+  <div id="app" class="h-full w-full overflow-auto relative" style="background: linear-gradient(135deg, #fff5f7 0%, #ffeef2 50%, #fff0f5 100%);"><!-- Flores Container -->
+   <div id="flowers-container"></div><!-- Main Content -->
+   <div class="min-h-full w-full flex flex-col items-center justify-center p-4 sm:p-8"><!-- Envelope State -->
+    <div id="envelope-state">
+     <div class="text-center mb-8">
+      <p class="font-elegant text-xl" style="color: #ad1457;">Para você, mamãe ❤️</p>
+     </div><!-- Envelope -->
+     <div class="envelope-closed" id="envelope-closed">
+      <div class="envelope-container">
+       <div class="envelope-back"></div>
+       <div class="envelope-front">
+        <div class="envelope-flap"></div>
+        <div class="envelope-content">
+         <div class="envelope-text">
+          Clique para abrir 💌
+         </div>
+        </div>
+       </div>
+      </div>
+     </div><!-- Open Button -->
+     <div class="text-center mt-8"><button id="open-btn" class="open-envelope-btn"> Abrir Cartinha 💝 </button>
+     </div>
+    </div><!-- Card State -->
+    <div id="card-state" class="hidden">
+     <div class="card-appear card-hover w-full max-w-md"><!-- Card Container -->
+      <div class="gradient-border p-1 rounded-3xl shadow-2xl">
+       <div id="card-bg" class="rounded-3xl p-6 sm:p-8 relative overflow-hidden" style="background: linear-gradient(145deg, #ffffff 0%, #fff9fb 100%);"><!-- Decorative Elements -->
+        <div class="absolute top-0 left-0 w-32 h-32 opacity-10" style="background: radial-gradient(circle, #f48fb1 0%, transparent 70%);"></div>
+        <div class="absolute bottom-0 right-0 w-40 h-40 opacity-10" style="background: radial-gradient(circle, #ce93d8 0%, transparent 70%);"></div><!-- Header Flowers -->
+        <div class="text-center mb-4"><span class="text-3xl">🌸</span> <span class="text-2xl mx-1">🌷</span> <span class="text-3xl">🌺</span>
+        </div><!-- Title -->
+        <h1 id="card-title" class="font-elegant text-center text-2xl sm:text-3xl font-semibold mb-2" style="color: #ad1457;">Feliz Dia das Mulheres</h1><!-- Recipient Name -->
+        <p id="recipient" class="font-elegant text-center text-xl italic mb-6" style="color: #c2185b;">Querida Mamãe</p><!-- Divider -->
+        <div class="flex items-center justify-center gap-3 mb-6">
+         <div class="h-px w-12 bg-gradient-to-r from-transparent to-pink-300"></div><span class="text-pink-400">✿</span>
+         <div class="h-px w-12 bg-gradient-to-l from-transparent to-pink-300"></div>
+        </div><!-- Quote Section -->
+        <div id="quote-container" class="min-h-32 flex items-center justify-center mb-6">
+         <p id="quote-text" class="quote-transition font-elegant text-center text-lg sm:text-xl leading-relaxed px-2" style="color: #6a1b4d;">"Mãe, você é a mulher mais incrível que conheço. Sua força e amor iluminam minha vida todos os dias."</p>
+        </div><!-- Change Quote Button -->
+        <div class="text-center mb-4"><button id="change-quote-btn" class="group relative px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 hover:scale-105 active:scale-95" style="background: linear-gradient(135deg, #f8bbd9 0%, #f48fb1 100%); color: #880e4f;"> <span class="relative z-10 flex items-center gap-2"> <span>✨</span> Nova Mensagem <span>✨</span> </span> </button>
+        </div><!-- Interactive Elements -->
+        <div class="flex gap-4 justify-center mb-6">
+         <button id="heart-btn" class="interactive-btn text-2xl hover:scale-110 active:scale-90 transition-transform duration-200" title="Enviar Amor">❤️</button> <button id="sparkle-btn" class="interactive-btn text-2xl hover:scale-110 active:scale-90 transition-transform duration-200" title="Brilho">✨</button> <button id="rose-btn" class="interactive-btn text-2xl hover:scale-110 active:scale-90 transition-transform duration-200" title="Mais Flores">🌹</button>
+        </div><!-- Sender Name -->
+        <p id="sender" class="font-soft text-center text-sm mb-6" style="color: #ad1457;">Com todo meu amor ❤️</p><!-- Divider -->
+        <div class="flex items-center justify-center gap-2 mb-6"><span class="text-pink-300">•</span> <span class="text-pink-400">•</span> <span class="text-pink-300">•</span>
+        </div><!-- Spotify Button -->
+        <div class="text-center mb-6"><a href="https://open.spotify.com/intl-pt/track/3YhZmqOIDldFyMDsHGUkbG" target="_blank" rel="noopener noreferrer" id="spotify-btn" class="group inline-flex items-center gap-3 px-6 py-3 rounded-full text-white font-medium shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl active:scale-95" style="background: linear-gradient(135deg, #1DB954 0%, #1ed760 100%);">
+          <svg class="w-5 h-5" viewbox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
+          </svg><span>Clique Aqui</span> <span class="group-hover:translate-x-1 transition-transform">→</span> </a>
+        </div><!-- Back Button -->
+        <div class="text-center"><button id="close-btn" class="text-sm px-4 py-2 rounded-full transition-all duration-300 hover:opacity-70" style="background: rgba(244, 143, 177, 0.2); color: #ad1457;"> ← Voltar </button>
+        </div><!-- Footer Decoration -->
+        <div class="text-center mt-4"><span class="text-xl">🌹</span> <span class="text-lg mx-2">💐</span> <span class="text-xl">🌹</span>
+        </div>
+       </div>
+      </div><!-- Date Badge -->
+      <div class="text-center mt-4"><span class="inline-block px-4 py-1 rounded-full text-xs font-medium" style="background: rgba(244, 143, 177, 0.3); color: #ad1457;"> 8 de Março </span>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    // Frases emocionantes para o cartão
+    const quotes = [
+      "Mãe, você é a mulher mais incrível que conheço. Sua força e amor iluminam minha vida todos os dias.",
+      "Obrigado(a) por ser meu porto seguro, minha inspiração e meu maior exemplo de mulher forte e amorosa.",
+      "Seu abraço é meu lugar favorito no mundo. Te amo mais do que as palavras podem expressar.",
+      "Você me ensinou que amar é o verbo mais bonito. Obrigado(a) por todo carinho e dedicação.",
+      "Mãe, sua força me inspira a ser melhor todos os dias. Você é minha heroína.",
+      "Cada sorriso seu ilumina meu mundo. Você é a mulher mais especial da minha vida.",
+      "Obrigado(a) por nunca desistir de mim e por me amar incondicionalmente.",
+      "Você é a prova viva de que anjos existem. Te amo infinitamente, mãe.",
+      "Sua bondade e gentileza tocam todos ao seu redor. Tenho orgulho de ser seu filho(a).",
+      "Mãe, você é minha estrela-guia, meu exemplo de coragem e amor verdadeiro.",
+      "Não existe amor mais puro e verdadeiro do que o seu. Gratidão eterna por você existir.",
+      "Você transformou minha vida em algo lindo simplesmente por existir nela."
+    ];
+    
+    let currentQuoteIndex = 0;
+    
+    // Default configuration
+    const defaultConfig = {
+      recipient_name: "Querida Mamãe",
+      sender_name: "Com todo meu amor ❤️",
+      primary_color: "#ad1457",
+      secondary_color: "#f48fb1",
+      text_color: "#6a1b4d",
+      background_color: "#fff5f7",
+      accent_color: "#1DB954",
+      font_family: "Cormorant Garamond"
+    };
+    
+    // Flower animation
+    const flowers = ['🌸', '🌺', '💮', '🌹', '💐', '🪻', '🌼', '✿', '❀'];
+    
+    function createFlower() {
+      const flower = document.createElement('div');
+      flower.className = 'flower';
+      flower.textContent = flowers[Math.floor(Math.random() * flowers.length)];
+      flower.style.left = Math.random() * 100 + '%';
+      flower.style.fontSize = (Math.random() * 20 + 16) + 'px';
+      flower.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
+      flower.style.animationDelay = Math.random() * 0.2 + 's';
+      
+      document.getElementById('flowers-container').appendChild(flower);
+      
+      setTimeout(() => flower.remove(), 3500);
+    }
+    
+    // Initial burst of flowers
+    function flowerBurst() {
+      for (let i = 0; i < 30; i++) {
+        setTimeout(createFlower, i * 100);
+      }
+    }
+    
+    // Continuous flower rain
+    function startFlowerRain() {
+      setInterval(createFlower, 150);
+    }
+    
+    // Change quote function
+    function changeQuote() {
+      const quoteText = document.getElementById('quote-text');
+      quoteText.style.opacity = '0';
+      quoteText.style.transform = 'translateY(10px)';
+      
+      setTimeout(() => {
+        currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
+        quoteText.textContent = `"${quotes[currentQuoteIndex]}"`;
+        quoteText.style.opacity = '1';
+        quoteText.style.transform = 'translateY(0)';
+        
+        // Burst of flowers on quote change
+        for (let i = 0; i < 8; i++) {
+          setTimeout(createFlower, i * 50);
+        }
+      }, 300);
+    }
+    
+    // Config change handler
+    async function onConfigChange(config) {
+      const fontFamily = config.font_family || defaultConfig.font_family;
+      const primaryColor = config.primary_color || defaultConfig.primary_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const secondaryColor = config.secondary_color || defaultConfig.secondary_color;
+      
+      // Update recipient
+      const recipient = document.getElementById('recipient');
+      recipient.textContent = config.recipient_name || defaultConfig.recipient_name;
+      recipient.style.fontFamily = `${fontFamily}, Georgia, serif`;
+      
+      // Update sender
+      const sender = document.getElementById('sender');
+      sender.textContent = config.sender_name || defaultConfig.sender_name;
+      
+      // Update title
+      const title = document.getElementById('card-title');
+      title.style.color = primaryColor;
+      title.style.fontFamily = `${fontFamily}, Georgia, serif`;
+      
+      // Update quote
+      const quote = document.getElementById('quote-text');
+      quote.style.color = textColor;
+      quote.style.fontFamily = `${fontFamily}, Georgia, serif`;
+      quote.style.fontSize = `${(config.font_size || 18) * 1.1}px`;
+      
+      // Update recipient color
+      recipient.style.color = secondaryColor;
+    }
+    
+    // Map to capabilities
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => { config.background_color = value; window.elementSdk.setConfig({ background_color: value }); }
+          },
+          {
+            get: () => config.secondary_color || defaultConfig.secondary_color,
+            set: (value) => { config.secondary_color = value; window.elementSdk.setConfig({ secondary_color: value }); }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => { config.text_color = value; window.elementSdk.setConfig({ text_color: value }); }
+          },
+          {
+            get: () => config.primary_color || defaultConfig.primary_color,
+            set: (value) => { config.primary_color = value; window.elementSdk.setConfig({ primary_color: value }); }
+          },
+          {
+            get: () => config.accent_color || defaultConfig.accent_color,
+            set: (value) => { config.accent_color = value; window.elementSdk.setConfig({ accent_color: value }); }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => { config.font_family = value; window.elementSdk.setConfig({ font_family: value }); }
+        },
+        fontSizeable: {
+          get: () => config.font_size || 18,
+          set: (value) => { config.font_size = value; window.elementSdk.setConfig({ font_size: value }); }
+        }
+      };
+    }
+    
+    // Map to edit panel values
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["recipient_name", config.recipient_name || defaultConfig.recipient_name],
+        ["sender_name", config.sender_name || defaultConfig.sender_name]
+      ]);
+    }
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      // Start flower animations
+      flowerBurst();
+      setTimeout(startFlowerRain, 1000);
+      
+      // Envelope opening
+      const openBtn = document.getElementById('open-btn');
+      const envelopeState = document.getElementById('envelope-state');
+      const cardState = document.getElementById('card-state');
+      const envelopeClosed = document.getElementById('envelope-closed');
+      const closeBtn = document.getElementById('close-btn');
+      
+      openBtn.addEventListener('click', () => {
+        envelopeClosed.classList.add('envelope-open');
+        
+        setTimeout(() => {
+          envelopeState.classList.add('hidden');
+          cardState.classList.remove('hidden');
+          
+          // Extra burst when opening
+          for (let i = 0; i < 20; i++) {
+            setTimeout(createFlower, i * 50);
+          }
+        }, 800);
+      });
+      
+      closeBtn.addEventListener('click', () => {
+        cardState.classList.add('hidden');
+        envelopeState.classList.remove('hidden');
+        envelopeClosed.classList.remove('envelope-open');
+      });
+      
+      // Setup quote change button
+      document.getElementById('change-quote-btn').addEventListener('click', changeQuote);
+      
+      // Heart button - create floating hearts
+      document.getElementById('heart-btn').addEventListener('click', (e) => {
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => {
+            const heart = document.createElement('div');
+            heart.className = 'floating-heart';
+            heart.textContent = '❤️';
+            heart.style.left = (e.clientX || window.innerWidth / 2) + 'px';
+            heart.style.top = (e.clientY || window.innerHeight / 2) + 'px';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 2000);
+          }, i * 100);
+        }
+      });
+      
+      // Sparkle button - burst of flowers
+      document.getElementById('sparkle-btn').addEventListener('click', () => {
+        for (let i = 0; i < 15; i++) {
+          setTimeout(createFlower, i * 50);
+        }
+      });
+      
+      // Rose button - extra roses floating
+      document.getElementById('rose-btn').addEventListener('click', () => {
+        for (let i = 0; i < 8; i++) {
+          setTimeout(() => {
+            const rose = document.createElement('div');
+            rose.className = 'floating-heart';
+            rose.textContent = '🌹';
+            rose.style.left = Math.random() * window.innerWidth + 'px';
+            rose.style.top = window.innerHeight + 'px';
+            rose.style.animation = 'heart-float 3s ease-out forwards';
+            document.body.appendChild(rose);
+            setTimeout(() => rose.remove(), 3000);
+          }, i * 150);
+        }
+      });
+    });
+    
+    // Initialize Element SDK
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9da1958483747254',t:'MTc3MzEzNzk5Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html> 
