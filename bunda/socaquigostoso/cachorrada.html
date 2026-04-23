@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cachorro Fantasma: O Labirinto (Teclado)</title>
+    <style>
+        body { 
+            margin: 0; background: #000; color: #ff4444;
+            display: flex; flex-direction: column; align-items: center; 
+            justify-content: center; height: 100vh; overflow: hidden;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        #game-container { position: relative; border: 4px solid #300; }
+        canvas { background: #050505; display: block; }
+        .ui { position: absolute; top: 15px; left: 15px; font-size: 1.2rem; z-index: 10; color: #fff; }
+        .controls-hint { position: absolute; bottom: 15px; width: 100%; text-align: center; color: #555; font-size: 0.8rem; }
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+            z-index: 20; text-align: center;
+        }
+        button {
+            background: #600; color: #fff; border: 1px solid red;
+            padding: 15px 30px; cursor: pointer; font-family: inherit; margin-top: 20px;
+        }
+        .horror-glitch { animation: glitch 0.3s infinite; color: red; }
+        @keyframes glitch { 0% { transform: skew(2deg); } 50% { transform: skew(-2deg); } 100% { transform: skew(0); } }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div class="ui">OBJETIVO: <span id="objective">Ache a chave 🔑</span></div>
+        <canvas id="horrorCanvas" width="800" height="600"></canvas>
+        <div class="controls-hint">USE WASD OU SETAS PARA MOVER</div>
+        <div id="screen" class="overlay">
+            <h1 id="statusTitle" class="horror-glitch">ALGO TE ALCANÇOU...</h1>
+            <p id="statusDesc"></p>
+            <button onclick="startGame()">TENTAR NOVAMENTE</button>
+        </div>
+    </div>
+
+<script>
+    const canvas = document.getElementById("horrorCanvas");
+    const ctx = canvas.getContext("2d");
+    const objectiveTxt = document.getElementById("objective");
+    const screen = document.getElementById("screen");
+
+    let player, enemy, gameActive, walls, key, exit, hasKey, heartbeat;
+    const TILE_SIZE = 40;
+    const PLAYER_SPEED = 4;
+
+    // Estado das teclas
+    const keys = {};
+
+    window.addEventListener('keydown', e => keys[e.code] = true);
+    window.addEventListener('keyup', e => keys[e.code] = false);
+
+    function startGame() {
+        gameActive = true;
+        hasKey = false;
+        heartbeat = 0;
+        player = { x: 60, y: 60, radius: 15 };
+        enemy = { x: 740, y: 540, speed: 1.4 };
+        objectiveTxt.innerText = "Ache a chave 🔑";
+        objectiveTxt.style.color = "white";
+        screen.style.display = "none";
+        
+        generateMap();
+        loop();
+    }
+
+    function generateMap() {
+        walls = [];
+        const cols = canvas.width / TILE_SIZE;
+        const rows = canvas.height / TILE_SIZE;
+
+        for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+                const isEdge = x === 0 || y === 0 || x === cols - 1 || y === rows - 1;
+                const isStartArea = x < 3 && y < 3;
+                const isEndArea = x > cols - 4 && y > rows - 4;
+                if (isEdge || (Math.random() < 0.2 && !isStartArea && !isEndArea)) {
+                    walls.push({ x: x * TILE_SIZE, y: y * TILE_SIZE, w: TILE_SIZE, h: TILE_SIZE });
+                }
+            }
+        }
+        
+        key = { x: (Math.floor(Math.random() * (cols-4)) + 2) * TILE_SIZE + 10, 
+                y: (Math.floor(Math.random() * (rows-4)) + 2) * TILE_SIZE + 10 };
+        exit = { x: (cols - 2) * TILE_SIZE + 5, y: (rows - 2) * TILE_SIZE + 5 };
+    }
+
+    function update() {
+        if (!gameActive) return;
+
+        // Lógica de Movimentação por Teclado
+        let dx = 0;
+        let dy = 0;
+
+        if (keys['ArrowUp'] || keys['KeyW']) dy -= PLAYER_SPEED;
+        if (keys['ArrowDown'] || keys['KeyS']) dy += PLAYER_SPEED;
+        if (keys['ArrowLeft'] || keys['KeyA']) dx -= PLAYER_SPEED;
+        if (keys['ArrowRight'] || keys['KeyD']) dx += PLAYER_SPEED;
+
+        // Tentar mover em X e Y separadamente para colisão suave
+        if (!checkWallCollision(player.x + dx, player.y)) player.x += dx;
+        if (!checkWallCollision(player.x, player.y + dy)) player.y += dy;
+
+        // Movimento do inimigo
+        const edx = player.x - enemy.x;
+        const edy = player.y - enemy.y;
+        const dist = Math.sqrt(edx*edx + edy*edy);
+        enemy.x += (edx/dist) * enemy.speed;
+        enemy.y += (edy/dist) * enemy.speed;
+        enemy.speed += 0.0004;
+        heartbeat += 0.06;
+
+        // Pegar Chave
+        const distKey = Math.sqrt((player.x-key.x)**2 + (player.y-key.y)**2);
+        if (!hasKey && distKey < 30) {
+            hasKey = true;
+            objectiveTxt.innerText = "Fuja pela porta! 🚪";
+            objectiveTxt.style.color = "#0f0";
+        }
+
+        // Vencer
+        const distExit = Math.sqrt((player.x-exit.x)**2 + (player.y-exit.y)**2);
+        if (hasKey && distExit < 30) endGame(true);
+
+        // Morrer
+        if (dist < 35) endGame(false);
+    }
+
+    function checkWallCollision(nx, ny) {
+        return walls.some(w => nx + 12 > w.x && nx - 12 < w.x + w.w && ny + 12 > w.y && ny - 12 < w.y + w.h);
+    }
+
+    function draw() {
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Lanterna (segue o player)
+        const pulse = Math.sin(heartbeat) * 8;
+        const grad = ctx.createRadialGradient(player.x, player.y, 10, player.x, player.y, 140 + pulse);
+        grad.addColorStop(0, "rgba(60, 0, 0, 0.6)");
+        grad.addColorStop(1, "rgba(0, 0, 0, 1)");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Desenhar Paredes
+        ctx.fillStyle = "#1a0505";
+        walls.forEach(w => ctx.fillRect(w.x, w.y, w.w, w.h));
+
+        // Itens
+        const dKey = Math.sqrt((player.x-key.x)**2 + (player.y-key.y)**2);
+        if (!hasKey && dKey < 140) {
+            ctx.font = "25px Arial";
+            ctx.fillText("🔑", key.x, key.y + 20);
+        }
+
+        const dExit = Math.sqrt((player.x-exit.x)**2 + (player.y-exit.y)**2);
+        if (dExit < 140) {
+            ctx.font = "35px Arial";
+            ctx.fillText(hasKey ? "🚪" : "🔒", exit.x, exit.y + 30);
+        }
+
+        // Personagens
+        ctx.font = "30px Arial";
+        ctx.fillText("🐕", player.x - 15, player.y + 10);
+        
+        const dEnemy = Math.sqrt((player.x-enemy.x)**2 + (player.y-enemy.y)**2);
+        if (dEnemy < 150) {
+            ctx.font = "45px Arial";
+            ctx.fillText("🐺", enemy.x - 20, enemy.y + 20);
+        }
+    }
+
+    function endGame(win) {
+        gameActive = false;
+        screen.style.display = "flex";
+        document.getElementById("statusTitle").innerText = win ? "VOCÊ ESCAPOU!" : "PEGUEI VOCÊ...";
+        document.getElementById("statusTitle").style.color = win ? "#0f0" : "red";
+        document.getElementById("statusDesc").innerText = win ? "Você encontrou a saída!" : "A escuridão te consumiu.";
+    }
+
+    function loop() {
+        if (!gameActive) return;
+        update();
+        draw();
+        requestAnimationFrame(loop);
+    }
+
+    startGame();
+</script>
+</body>
+</html>
