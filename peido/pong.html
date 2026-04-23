@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mini Pong</title>
+    <style>
+        body { background: #000; text-align: center; }
+        canvas { background: #111; cursor: none; border: 2px solid #fff; }
+    </style>
+</head>
+<body>
+    <canvas id="pong" width="600" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById("pong");
+        const ctx = canvas.getContext("2d");
+        let ball = { x: 300, y: 200, dx: 4, dy: 4, r: 10 };
+        let paddle = { w: 100, h: 10, x: 250 };
+
+        canvas.addEventListener("mousemove", e => {
+            paddle.x = e.clientX - canvas.offsetLeft - paddle.w/2;
+        });
+
+        function update() {
+            ball.x += ball.dx; ball.y += ball.dy;
+            if(ball.x < 0 || ball.x > canvas.width) ball.dx *= -1;
+            if(ball.y < 0) ball.dy *= -1;
+            if(ball.y > canvas.height - paddle.h && ball.x > paddle.x && ball.x < paddle.x + paddle.w) ball.dy *= -1.1;
+            if(ball.y > canvas.height) { alert("Perdeu!"); location.reload(); }
+            
+            ctx.clearRect(0,0,600,400);
+            ctx.fillStyle = "white";
+            ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2); ctx.fill();
+            ctx.fillRect(paddle.x, canvas.height - paddle.h, paddle.w, paddle.h);
+            requestAnimationFrame(update);
+        }
+        update();
+    </script>
+</body>
+</html>
