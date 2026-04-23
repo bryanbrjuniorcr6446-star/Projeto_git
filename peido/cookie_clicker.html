@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { text-align: center; font-family: sans-serif; background: #f0f0f0; padding-top: 50px; }
+        #cookie { font-size: 100px; cursor: pointer; transition: transform 0.1s; display: inline-block; }
+        #cookie:active { transform: scale(0.9); }
+        .stats { font-size: 24px; margin: 20px; }
+        button { padding: 10px; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="stats">Moedas: <span id="score">0</span></div>
+    <div id="cookie">🍪</div>
+    <br><br>
+    <button onclick="buyUpgrade()">Upgrade (+1 por clique) - Custo: <span id="cost">10</span></button>
+
+    <script>
+        let score = 0;
+        let clickValue = 1;
+        let upgradeCost = 10;
+
+        document.getElementById('cookie').onclick = () => {
+            score += clickValue;
+            updateDisplay();
+        };
+
+        function buyUpgrade() {
+            if(score >= upgradeCost) {
+                score -= upgradeCost;
+                clickValue++;
+                upgradeCost = Math.round(upgradeCost * 1.5);
+                updateDisplay();
+            }
+        }
+
+        function updateDisplay() {
+            document.getElementById('score').innerText = score;
+            document.getElementById('cost').innerText = upgradeCost;
+        }
+    </script>
+</body>
+</html>
